@@ -1,0 +1,12 @@
+{
+  "mrhsce": {
+    "serverConfig": {
+      "port": 1994,
+      "productPort": 1994,
+      "SN": "/api-v1"
+    },
+    "uploadConfig": {
+      "path": "/views/images"
+    }
+  }
+}
