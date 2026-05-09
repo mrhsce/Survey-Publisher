@@ -1,11 +1,16 @@
 const betterSqlite3 = require('better-sqlite3');
+const fs = require('fs');
 const logger = require('./winstonLogger');
 
 
 class DatabaseHandler{
     constructor(){
-
-        this.dbSync = new betterSqlite3('./main.db', null);
+        // Load DB path from environment to avoid shipping production DB in the repository
+        const dbPath = process.env.SQLITE_DB_PATH || './main.db';
+        if (!fs.existsSync(dbPath)) {
+            logger.warn(`SQLite DB not found at ${dbPath}. Create the DB and set SQLITE_DB_PATH or place a main.db in the project root.`);
+        }
+        this.dbSync = new betterSqlite3(dbPath, null);
     }
 
     addSMS(message){

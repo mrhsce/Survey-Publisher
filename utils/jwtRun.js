@@ -1,12 +1,22 @@
 const fs = require('fs');
+const path = require('path');
 const jwt = require('jsonwebtoken');
 
 const logger = require('./winstonLogger');
 
+// Load key paths from environment to avoid keeping private keys in repo.
+// Operators should set JWT_PRIVATE_KEY_PATH and JWT_PUBLIC_KEY_PATH.
+const privateKeyPath = process.env.JWT_PRIVATE_KEY_PATH || path.join(__dirname, 'private.key');
+const publicKeyPath = process.env.JWT_PUBLIC_KEY_PATH || path.join(__dirname, 'public.key');
 
-// use 'utf8' to get string instead of byte array  (512 bit key)
-const privateKEY = fs.readFileSync(__dirname + '/private.key', 'utf8');
-const publicKEY = fs.readFileSync(__dirname + '/public.key', 'utf8');
+if (!fs.existsSync(privateKeyPath) || !fs.existsSync(publicKeyPath)) {
+    logger.error('JWT key files not found. Set JWT_PRIVATE_KEY_PATH and JWT_PUBLIC_KEY_PATH environment variables and place keys outside the repository.');
+    throw new Error('Missing JWT key files. See README for setup.');
+}
+
+// use 'utf8' to get string instead of byte array
+const privateKEY = fs.readFileSync(privateKeyPath, 'utf8');
+const publicKEY = fs.readFileSync(publicKeyPath, 'utf8');
 module.exports = {
     tokenValidation: (req, type, callBack) => {
         let token = req.headers['authorization']; // Express headers are auto converted to lowercase
